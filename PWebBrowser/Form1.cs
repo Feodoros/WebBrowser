@@ -18,7 +18,6 @@ namespace PWebBrowser
         private const string HeadWindow = "[Window]";
         private const string HeadBrowser = "[Browser]";
 
-
         public Form1()
         {
             InitializeComponent();
