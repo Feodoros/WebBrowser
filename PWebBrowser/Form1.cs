@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Windows;
 
 namespace PWebBrowser
 {
@@ -43,28 +44,68 @@ namespace PWebBrowser
             Dictionary<string, string> windowSettings = settings[HeadWindow];
             Dictionary<string, string> browserSettings = settings[HeadBrowser];
 
+            // Настройки по умолчанию
+            uint width = 400;
+            uint height = 400;
+            uint left = 30;
+            uint top = 70;           
+
+            // Проверка параметров окна
+            try
+            {
+                width = UInt32.Parse(windowSettings["Width"]);
+                height = UInt32.Parse(windowSettings["Height"]);
+                left = UInt32.Parse(windowSettings["Left"]);
+                top = UInt32.Parse(windowSettings["Top"]);
+            }
+            catch
+            {
+                string messageBoxText = "Параметры окна введены неверно! Параметры окна заданы по умолчанию.";
+                string caption = "Ошибка параметров окна";
+                MessageBoxButton button = MessageBoxButton.OK;
+                MessageBoxImage icon = MessageBoxImage.Warning;
+                System.Windows.MessageBox.Show(messageBoxText, caption, button, icon);
+            }
+
             // Настройки окна
-            this.Width = Int32.Parse(windowSettings["Width"]);
-            this.Height = Int32.Parse(windowSettings["Height"]);
-            this.Left = Int32.Parse(windowSettings["Left"]);
-            this.Top = Int32.Parse(windowSettings["Top"]);
-            if(windowSettings["WindowState"] == "Normal")
+            this.Width = (int)width;
+            this.Height = (int)height;
+            this.Left = (int)left;
+            this.Top = (int)top;
+
+            if (windowSettings["WindowState"] == "Normal")
             {
                 this.WindowState = FormWindowState.Normal;
             }
-            if (windowSettings["WindowState"] == "Maximized")
+            else
             {
-                this.WindowState = FormWindowState.Maximized;
+                if (windowSettings["WindowState"] == "Maximized")
+                {
+                    this.WindowState = FormWindowState.Maximized;
+                }
+                else
+                {
+                    if (windowSettings["WindowState"] == "Minimized")
+                    {
+                        this.WindowState = FormWindowState.Minimized;
+                    }
+                    else
+                    {
+                        string messageBoxText = "Параметр \"WindowState\" должен быть: Normal, Maximized, Minimized! Параметр установлен по умолчанию.";
+                        string caption = "Ошибка параметра \"WindowState\"";
+                        MessageBoxButton button = MessageBoxButton.OK;
+                        MessageBoxImage icon = MessageBoxImage.Warning;
+                        System.Windows.MessageBox.Show(messageBoxText, caption, button, icon);
+                        this.WindowState = FormWindowState.Normal;
+                    }
+                }
             }
-            if (windowSettings["WindowState"] == "Minimized")
-            {
-                this.WindowState = FormWindowState.Minimized;
-            }
-
+                        
             // Настройки браузера
             txtURL.Text = browserSettings["URL"];
 
-
+            wbBrowser.Navigate(txtURL.Text);  
+            
         }
 
         private void WriteSettings()
