@@ -61,6 +61,8 @@ namespace PWebBrowser
                 this.WindowState = FormWindowState.Minimized;
             }
 
+            // Настройки браузера
+            txtURL.Text = browserSettings["URL"];
 
 
         }
@@ -107,13 +109,13 @@ namespace PWebBrowser
 
         private void SetDefaultSettings()
         {
-            string defaultWidth = "Width: 400";
-            string defaultHeight = "Height: 400";
-            string defaultLeft = "Left: 30";
-            string defaultTop = "Top: 70";
-            string defaultWindowState = "WindowState: Normal";
+            string defaultWidth = "Width=400";
+            string defaultHeight = "Height=400";
+            string defaultLeft = "Left=30";
+            string defaultTop = "Top=70";
+            string defaultWindowState = "WindowState=Normal";
 
-            string defaultURL = "ya.ru";
+            string defaultURL = "URL=ya.ru";
 
             using (var file = File.Open(strINIFile, FileMode.CreateNew))
             {
@@ -154,11 +156,14 @@ namespace PWebBrowser
                             windowSettings[key] = value;
                         }
 
-                        while ((line = stream.ReadLine()) != "")
-                        {
+                        line = stream.ReadLine();
+
+                        while (line != "" && line != null)
+                        {                            
                             string key = line.Split('=')[0];
                             string value = line.Split('=')[1];
                             browserSettings[key] = value;
+                            line = stream.ReadLine();
                         }
 
                     }
@@ -172,11 +177,14 @@ namespace PWebBrowser
                             browserSettings[key] = value;
                         }
 
-                        while ((line = stream.ReadLine()) != "")
-                        {
+                        line = stream.ReadLine();
+
+                        while (line != "" && line != null)
+                        {                            
                             string key = line.Split('=')[0];
                             string value = line.Split('=')[1];
                             windowSettings[key] = value;
+                            line = stream.ReadLine();
                         }
                     }
 
