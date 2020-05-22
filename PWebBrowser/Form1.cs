@@ -38,7 +38,30 @@ namespace PWebBrowser
                 SetDefaultSettings();
             }
 
-            var x = ReadSettings();
+            Dictionary<string, Dictionary<string, string>> settings = ReadSettings();
+
+            Dictionary<string, string> windowSettings = settings[HeadWindow];
+            Dictionary<string, string> browserSettings = settings[HeadBrowser];
+
+            // Настройки окна
+            this.Width = Int32.Parse(windowSettings["Width"]);
+            this.Height = Int32.Parse(windowSettings["Height"]);
+            this.Left = Int32.Parse(windowSettings["Left"]);
+            this.Top = Int32.Parse(windowSettings["Top"]);
+            if(windowSettings["WindowState"] == "Normal")
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
+            if (windowSettings["WindowState"] == "Maximized")
+            {
+                this.WindowState = FormWindowState.Maximized;
+            }
+            if (windowSettings["WindowState"] == "Minimized")
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
+
+
 
         }
 
