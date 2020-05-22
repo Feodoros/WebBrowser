@@ -26,6 +26,24 @@ namespace PWebBrowser
         // Обработчик события закрытия формы
         private void Form1_FormClosed(Object sender, FormClosedEventArgs e)
         {
+            WriteSettings();
+        }
+
+        // Обработчик события загрузки формы
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+            if (!File.Exists(strINIFile))
+            {
+                SetDefaultSettings();
+            }
+
+            var x = ReadSettings();
+
+        }
+
+        private void WriteSettings()
+        {
             // Сохраняем настройки окна
             int width = this.Width;
             int height = this.Height;
@@ -62,17 +80,92 @@ namespace PWebBrowser
                     }
                 }
             }
-
         }
 
-        // Обработчик события загрузки формы
-        private void Form1_Load(object sender, EventArgs e)
+        private void SetDefaultSettings()
         {
-            
+            string defaultWidth = "Width: 400";
+            string defaultHeight = "Height: 400";
+            string defaultLeft = "Left: 30";
+            string defaultTop = "Top: 70";
+            string defaultWindowState = "WindowState: Normal";
 
+            string defaultURL = "ya.ru";
+
+            using (var file = File.Open(strINIFile, FileMode.CreateNew))
+            {
+                using (var stream = new StreamWriter(file))
+                {
+                    stream.WriteLine(HeadWindow);
+                    stream.WriteLine(defaultLeft);
+                    stream.WriteLine(defaultTop);
+                    stream.WriteLine(defaultWidth);
+                    stream.WriteLine(defaultHeight);
+                    stream.WriteLine(defaultWindowState);
+                    stream.WriteLine(HeadBrowser);
+                    stream.WriteLine(defaultURL);
+
+                }
+            }
         }
 
-        
+        private Dictionary<string, Dictionary<string, string>> ReadSettings()
+        {
+            Dictionary<string, Dictionary<string, string>> settings = new Dictionary<string, Dictionary<string, string>>();
+
+            Dictionary<string, string> windowSettings = new Dictionary<string, string>();
+            Dictionary<string, string> browserSettings = new Dictionary<string, string>();
+
+            using (var file = File.Open(strINIFile, FileMode.Open, FileAccess.Read))
+            {
+                using (var stream = new StreamReader(file))
+                {
+                    string line = stream.ReadLine();
+
+                    if (line == HeadWindow)
+                    {
+                        while ((line = stream.ReadLine()) != HeadBrowser)
+                        {
+                            string key = line.Split('=')[0];
+                            string value = line.Split('=')[1];
+                            windowSettings[key] = value;
+                        }
+
+                        while ((line = stream.ReadLine()) != "")
+                        {
+                            string key = line.Split('=')[0];
+                            string value = line.Split('=')[1];
+                            browserSettings[key] = value;
+                        }
+
+                    }
+
+                    else
+                    {
+                        while ((line = stream.ReadLine()) != HeadWindow)
+                        {
+                            string key = line.Split('=')[0];
+                            string value = line.Split('=')[1];
+                            browserSettings[key] = value;
+                        }
+
+                        while ((line = stream.ReadLine()) != "")
+                        {
+                            string key = line.Split('=')[0];
+                            string value = line.Split('=')[1];
+                            windowSettings[key] = value;
+                        }
+                    }
+
+                }
+            }
+
+            settings[HeadWindow] = windowSettings;
+            settings[HeadBrowser] = browserSettings;
+
+            return settings;
+        }
+
         // Обработчик события нажатия клавиши
         private void txtURL_KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
